@@ -1,0 +1,10 @@
+{
+  "input_directory": "backend/data",
+  "output_directory": "backend/data/processed",
+  "counts": {
+    "cleaned": 15
+  },
+  "duplicate_ids": [],
+  "duplicate_content": [],
+  "errors": []
+}

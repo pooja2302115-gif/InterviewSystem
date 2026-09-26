@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/**/*.pt
+checkpoints/**/*.pth
+frontend/node_modules/
+frontend/dist/
+.DS_Store

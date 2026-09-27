@@ -16,10 +16,11 @@ class Conversation:
 class ConversationManager:
     """Maintain bounded user/assistant history and build generation prompts."""
 
-    def __init__(self, generator: Any, *, max_history_turns: int = 6) -> None:
+    def __init__(self, generator: Any, *, max_history_turns: int = 6, retriever: Any | None = None) -> None:
         if max_history_turns < 1:
             raise ValueError("max_history_turns must be positive")
         self.generator = generator
+        self.retriever = retriever
         self.max_history_turns = max_history_turns
         self.sessions: dict[str, Conversation] = {}
 
@@ -29,7 +30,11 @@ class ConversationManager:
         conversation = self._get_or_create(session_id)
         conversation.messages.append({"role": "user", "content": message.strip()})
         prompt = self.build_prompt(conversation)
-        response = self.generator.generate(prompt).strip()
+        response = self.retriever.answer(message) if self.retriever is not None else None
+        if response is None:
+            response = self.generator.generate(prompt).strip()
+        else:
+            response = response.strip()
         if not response:
             response = "I could not generate a response. Please try again."
         conversation.messages.append({"role": "assistant", "content": response})
@@ -38,13 +43,15 @@ class ConversationManager:
 
     def build_prompt(self, conversation: Conversation) -> str:
         lines = [
-            "System: You are an educational AI interview preparation assistant.",
+            "Instruction: You are an educational AI interview preparation assistant. "
             "Give accurate, concise explanations and ask useful follow-up questions.",
+            "Use the conversation history as context and answer the latest user message.",
+            "Conversation:",
         ]
         for message in conversation.messages:
             role = message["role"].capitalize()
             lines.append(f"{role}: {message['content']}")
-        lines.append("Assistant:")
+        lines.append("Response:")
         return "\n".join(lines)
 
     def get_history(self, session_id: str) -> list[dict[str, str]]:

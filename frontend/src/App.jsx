@@ -20,6 +20,26 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+async function readApiResponse(response) {
+  const body = await response.text();
+  let payload = null;
+  if (body.trim()) {
+    try {
+      payload = JSON.parse(body);
+    } catch {
+      const type = response.headers.get('content-type') || 'unknown content type';
+      throw new Error(`Backend returned an invalid response (${response.status}, ${type}). Check that FastAPI is running and restart it after code changes.`);
+    }
+  }
+  if (!response.ok) {
+    throw new Error(payload?.detail || `Backend request failed with HTTP ${response.status}.`);
+  }
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Backend returned an empty response. Restart FastAPI and try again.');
+  }
+  return payload;
+}
+
 const modes = [
   { label: 'Technical interview', icon: Code2, caption: 'Concepts, systems, trade-offs' },
   { label: 'DSA practice', icon: BrainCircuit, caption: 'Problems, hints, complexity' },
@@ -74,8 +94,10 @@ function App() {
           session_id: sessionId,
         }),
       });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.detail || 'The interview assistant is unavailable.');
+      const payload = await readApiResponse(response);
+      if (typeof payload.response !== 'string' || typeof payload.session_id !== 'string') {
+        throw new Error('Backend response is missing chat fields. Restart FastAPI and try again.');
+      }
       setSessionId(payload.session_id);
       setMessages((current) => [...current, { role: 'assistant', content: payload.response, time: 'Now' }]);
     } catch (requestError) {
@@ -117,8 +139,10 @@ function App() {
       const formData = new FormData();
       formData.append('file', file);
       const response = await fetch(`${API_URL}/resume/analyze`, { method: 'POST', body: formData });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.detail || 'Resume analysis failed.');
+      const payload = await readApiResponse(response);
+      if (!payload.profile || typeof payload.profile !== 'object') {
+        throw new Error('Backend response is missing resume analysis. Restart FastAPI and try again.');
+      }
       const profile = payload.profile;
       const summary = [
         `Resume analyzed: ${payload.filename}`,

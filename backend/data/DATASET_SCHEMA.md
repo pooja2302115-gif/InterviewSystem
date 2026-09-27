@@ -26,7 +26,7 @@ The initial corpus uses JSON Lines (one JSON object per line). Each record is an
 3. Keep answers factual and explain assumptions.
 4. Do not put secrets, personal student data, or copyrighted books in the dataset.
 5. Preserve raw source files under `backend/data/raw/`; cleaned exports belong under `backend/data/processed/`.
-6. The train/validation/test files are intentionally tiny seed files. They prove the pipeline shape, not model quality.
+6. The current generated train/validation/test files are educational seed data. They prove the pipeline and broaden topic coverage, but do not establish production model quality.
 
 ## Planned conversion
 
@@ -39,4 +39,4 @@ Processed records retain the fields above and add:
 
 In Phase 3, `backend/model/tokenizer.py` tokenizes only the processed training `text` values to build `backend/data/processed/vocab.json`. Validation and test text must not contribute new vocabulary entries. The tokenizer uses `<PAD>`, `<UNK>`, `<BOS>`, and `<EOS>` and produces integer IDs for Phase 4 sequence creation.
 
-Phase 4 uses those IDs to create shifted input/target windows for causal language modeling. The dataset keeps source records separate, pads short windows, and returns attention and loss masks.
+Phase 4 uses those IDs to create shifted input/target windows for causal language modeling. The dataset keeps source records separate, pads short windows, and returns attention and loss masks. The reproducible curated corpus builder is documented in `backend/data/CORPUS.md`.

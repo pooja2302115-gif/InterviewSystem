@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 from backend.chatbot.conversation import ConversationManager
 from backend.chatbot.inference import InferenceEngine
+from backend.chatbot.retrieval import QuestionBankRetriever
 from backend.resume.parser import extract_resume_file
 
 
@@ -62,7 +63,7 @@ def create_app(
     service = ChatService(manager)
     if service.manager is None and checkpoint_path and vocabulary_path:
         engine = InferenceEngine.from_checkpoint(checkpoint_path, vocabulary_path, device=device)
-        service.manager = ConversationManager(engine)
+        service.manager = ConversationManager(engine, retriever=QuestionBankRetriever())
 
     app = FastAPI(title="AI Interview Preparation System", version="0.1.0")
     app.state.chat_service = service

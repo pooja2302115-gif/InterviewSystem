@@ -26,6 +26,22 @@ def load_training_texts(path: Path) -> list[str]:
     return texts
 
 
+def load_instruction_training_texts(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+    texts = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        instruction = record.get("instruction")
+        response = record.get("response")
+        if not isinstance(instruction, str) or not isinstance(response, str):
+            raise ValueError(f"{path}:{line_number}: instruction and response must be strings")
+        texts.append(f"Instruction: {instruction}\nResponse: {response}")
+    return texts
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -40,11 +56,18 @@ def main() -> None:
         default=Path("backend/data/processed/vocab.json"),
         help="Path for the generated vocabulary JSON file.",
     )
+    parser.add_argument(
+        "--instruction-input",
+        type=Path,
+        default=Path("backend/data/instruction_train.jsonl"),
+        help="Optional instruction-training JSONL; its validation split is never used.",
+    )
     parser.add_argument("--min-frequency", type=int, default=1)
     parser.add_argument("--max-vocabulary-size", type=int, default=None)
     args = parser.parse_args()
 
     texts = load_training_texts(args.input)
+    texts.extend(load_instruction_training_texts(args.instruction_input))
     tokenizer = InterviewTokenizer.build(
         texts,
         min_frequency=args.min_frequency,
@@ -55,6 +78,7 @@ def main() -> None:
         json.dumps(
             {
                 "training_records": len(texts),
+                "instruction_training_file": str(args.instruction_input),
                 "vocabulary_size": tokenizer.vocabulary_size,
                 "output": str(args.output),
                 "special_tokens": list(SPECIAL_TOKENS),

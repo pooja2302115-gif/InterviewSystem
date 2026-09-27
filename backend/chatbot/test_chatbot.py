@@ -6,6 +6,7 @@ import torch
 
 from backend.chatbot.conversation import ConversationManager
 from backend.chatbot.inference import GenerationConfig, InferenceEngine
+from backend.chatbot.retrieval import QuestionBankRetriever
 from backend.model.model import InterviewLLM
 from backend.model.tokenizer import InterviewTokenizer
 
@@ -28,6 +29,8 @@ class ConversationTests(unittest.TestCase):
         self.assertEqual(first["session_id"], second["session_id"])
         self.assertEqual(len(manager.get_history(first["session_id"])), 4)
         self.assertIn("What is a stack?", generator.prompts[1])
+        self.assertTrue(generator.prompts[1].startswith("Instruction:"))
+        self.assertTrue(generator.prompts[1].endswith("Response:"))
 
     def test_history_is_bounded(self):
         manager = ConversationManager(FakeGenerator(), max_history_turns=1)
@@ -38,6 +41,13 @@ class ConversationTests(unittest.TestCase):
     def test_empty_message_is_rejected(self):
         with self.assertRaises(ValueError):
             ConversationManager(FakeGenerator()).chat(" ")
+
+    def test_known_python_definition_uses_curated_answer(self):
+        generator = FakeGenerator()
+        manager = ConversationManager(generator, retriever=QuestionBankRetriever())
+        result = manager.chat("[Technical interview] define Python")
+        self.assertIn("programming language", result["response"])
+        self.assertEqual(generator.prompts, [])
 
 
 class InferenceTests(unittest.TestCase):

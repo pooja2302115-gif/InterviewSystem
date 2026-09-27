@@ -18,6 +18,8 @@ append token and repeat
 
 Generation stops at `<EOS>` or `max_new_tokens`. When the prompt exceeds the model context, the most recent context is retained. The model is always put in evaluation mode and generation runs without gradients.
 
+The API conversation manager first checks `QuestionBankRetriever`, which searches curated training/source records. High-confidence matches return the reviewed definition or coding answer (including code, example output, and complexity when available). Unmatched questions fall through to autoregressive model generation. This is deliberate: a small from-scratch model can otherwise emit incoherent text even when a reviewed answer exists. The retriever is not a pretrained model or external API.
+
 `InferenceEngine` supports deterministic greedy decoding with `temperature=0` and probabilistic decoding with positive temperature. `top_k` restricts sampling to the k highest-scoring tokens. These controls affect decoding only; they do not improve the tiny model's learned knowledge.
 
 ## Conversation sessions

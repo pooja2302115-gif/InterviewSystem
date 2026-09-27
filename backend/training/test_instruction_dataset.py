@@ -17,7 +17,7 @@ class InstructionDatasetTests(unittest.TestCase):
         )
 
     def test_loads_instruction_records(self):
-        self.assertEqual(len(self.dataset), 8)
+        self.assertGreaterEqual(len(self.dataset), 100)
 
     def test_prompt_is_context_but_not_loss_target(self):
         example = self.dataset[0]

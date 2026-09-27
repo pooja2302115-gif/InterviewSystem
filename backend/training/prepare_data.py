@@ -19,7 +19,23 @@ REQUIRED_FIELDS = {
     "metadata",
 }
 SPLITS = ("train", "validation", "test")
-TEXT_FIELDS = ("category", "topic", "question", "answer", "example", "language")
+TEXT_FIELDS = (
+    "category",
+    "topic",
+    "question",
+    "answer",
+    "example",
+    "language",
+    "book_definition",
+    "simple_definition",
+    "secondary",
+    "expected_output",
+    "time_complexity",
+    "space_complexity",
+    "follow_up_question",
+    "seniority",
+    "question_type",
+)
 DIFFICULTIES = {"beginner", "intermediate", "advanced"}
 WHITESPACE_RE = re.compile(r"[ \t\r\f\v]+")
 
@@ -66,11 +82,35 @@ def render_text(record: dict[str, Any]) -> str:
         f"Question: {record['question']}",
         f"Answer: {record['answer']}",
     ]
+    for field, label in (
+        ("question_type", "Question type"),
+        ("seniority", "Seniority"),
+        ("book_definition", "Formal definition"),
+        ("simple_definition", "Simple explanation"),
+        ("secondary", "Alternate explanation"),
+    ):
+        if record.get(field):
+            sections.append(f"{label}: {record[field]}")
     if record.get("example"):
         sections.append(f"Example: {record['example']}")
     if record.get("code"):
         language = record.get("language", "text")
         sections.append(f"Code ({language}):\n{record['code'].rstrip()}")
+    if record.get("expected_output"):
+        sections.append(f"Expected output: {record['expected_output']}")
+    if record.get("time_complexity"):
+        sections.append(f"Time complexity: {record['time_complexity']}")
+    if record.get("space_complexity"):
+        sections.append(f"Space complexity: {record['space_complexity']}")
+    if record.get("follow_up_question"):
+        sections.append(f"Follow-up question: {record['follow_up_question']}")
+    for follow_up in record.get("interview_questions", []):
+        if isinstance(follow_up, dict):
+            level = follow_up.get("seniority", "interview")
+            question = follow_up.get("question", "")
+            answer = follow_up.get("answer", "")
+            if question and answer:
+                sections.append(f"{level.title()} follow-up: {question}\nAnswer guide: {answer}")
     if record.get("complexity"):
         complexity = record["complexity"]
         if isinstance(complexity, dict):

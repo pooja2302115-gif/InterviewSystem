@@ -27,14 +27,17 @@ This phase establishes the boundaries for the later implementation:
 
 ## Dataset design
 
-The seed corpus is JSONL: one JSON object per line. It includes examples from:
+The curated question bank is JSONL: one JSON object per line. It currently includes 122 distinct topic labels, 379 base records (314 train, 33 validation, 32 held-out test), and 462 instruction records (426 train, 36 validation). Coverage includes:
 
-- DSA: stacks, binary search, hash maps, and later linked lists and other topics.
-- Programming: a Python implementation example with complexity metadata.
-- CS fundamentals: DBMS, operating systems, networks, and OOP.
-- Interviews: project explanations, behavioral answers, resume questions, and HR preparation.
+- DSA: arrays, strings, linked lists, stacks, queues, hash maps, trees, heaps, graphs, tries, DP, recursion, backtracking, sliding windows, two pointers, search, sorting, and greedy methods.
+- Programming: Python, Java, C, and C++ concepts.
+- CS fundamentals: databases/SQL, operating systems, networks, OOP, software testing, architecture, web APIs, cloud, AI, and security.
+- Interviews and resumes: HR/STAR, project explanation, internship prep, resume skills extraction, and project evidence.
+- Structured Python foundations and code interviews: formal, simple, and alternate definitions.
+- Coding interview records: Python, Java, C, C++, and SQL with expected output, complexity, and fresher/senior follow-ups where provided.
+- Cross-subject structured Q&A: DBMS, SQL, OS, networks, OOP, architecture, software engineering, web, cloud, ML, computer vision, generative AI, cybersecurity, HR, and resume interviewing.
 
-The complete record contract is documented in [backend/data/DATASET_SCHEMA.md](backend/data/DATASET_SCHEMA.md). The current corpus is intentionally small. It validates the shape of the pipeline, but it is far too small to produce a capable conversational model.
+The record contract is documented in [backend/data/DATASET_SCHEMA.md](backend/data/DATASET_SCHEMA.md), structured question fields in [backend/data/QUESTION_BANK_SCHEMA.md](backend/data/QUESTION_BANK_SCHEMA.md), and regeneration steps in [backend/data/CORPUS.md](backend/data/CORPUS.md). This is a broader educational starter corpus, not a large production dataset; it is still far too small to produce reliable general-purpose conversation.
 
 ## Why JSONL first?
 
@@ -50,7 +53,7 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Validate the seed data without training anything:
+Validate the base JSONL data without training anything:
 
 ```bash
 python - <<'PY'
@@ -60,7 +63,7 @@ from pathlib import Path
 required = {"id", "category", "topic", "question", "answer", "difficulty", "metadata"}
 ids = set()
 count = 0
-for path in sorted(Path("backend/data").glob("*.jsonl")):
+for path in sorted(Path("backend/data").glob("train.jsonl")) + sorted(Path("backend/data").glob("validation.jsonl")) + sorted(Path("backend/data").glob("test.jsonl")):
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         record = json.loads(line)
         missing = required - record.keys()
@@ -68,8 +71,16 @@ for path in sorted(Path("backend/data").glob("*.jsonl")):
         assert record["id"] not in ids, f"duplicate id: {record['id']}"
         ids.add(record["id"])
         count += 1
-print(f"Validated {count} records with {len(ids)} unique IDs.")
+print(f"Validated {count} base records with {len(ids)} unique IDs.")
 PY
+```
+
+Regenerate all curated base and instruction splits, preprocess the base text, and rebuild vocabulary before training:
+
+```bash
+python backend/data/generate_corpus.py
+python backend/training/prepare_data.py
+python backend/model/build_vocab.py
 ```
 
 ## Important limitation
@@ -201,7 +212,14 @@ python -m unittest discover -s backend/model -p 'test_*.py'
 
 The training pipeline is implemented in [backend/training/train.py](backend/training/train.py), with settings in [backend/training/config.py](backend/training/config.py). It uses cross-entropy with padding ignored, AdamW, gradient clipping, validation loss, token accuracy, perplexity, and epoch/best-model checkpoints.
 
-The training flow, loss masking, metrics, checkpoint contents, and command are documented in [backend/training/TRAINING.md](backend/training/TRAINING.md). Run the focused tests with:
+The training flow, loss masking, metrics, checkpoint contents, and command are documented in [backend/training/TRAINING.md](backend/training/TRAINING.md). The latest local training used 3 epochs on CPU with context 128, dimension 64, 2 layers, and 4 heads. To reproduce:
+
+```bash
+python backend/training/train.py --checkpoint-directory checkpoints --context-length 128 --embedding-dimension 64 --num-layers 2 --num-heads 4 --feed-forward-dimension 256 --batch-size 8 --epochs 3 --device cpu
+python backend/training/fine_tune.py --base-checkpoint checkpoints/best_model.pt --checkpoint-directory checkpoints/instruction --batch-size 8 --epochs 3 --learning-rate 0.0001 --device cpu
+```
+
+Run the focused tests with:
 
 ```bash
 python -m unittest discover -s backend/training -p 'test_*.py'

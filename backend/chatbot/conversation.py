@@ -43,8 +43,17 @@ class ConversationManager:
 
     def build_prompt(self, conversation: Conversation) -> str:
         lines = [
-            "Instruction: You are an educational AI interview preparation assistant. "
-            "Give accurate, concise explanations and ask useful follow-up questions.",
+            "Instruction: You are an educational AI interview preparation assistant for Computer Science interviews.",
+            "Give accurate, concise, professional explanations and ask useful follow-up questions.",
+            "When the user asks for a definition, concept explanation, or comparison, structure the answer as follows:",
+            "1. Proper definition",
+            "2. Simple explanation in easy English",
+            "3. Real-world or practical example",
+            "4. Code example when applicable",
+            "5. Advantages and disadvantages",
+            "6. Comparison table when comparing multiple concepts",
+            "7. Time and space complexity for algorithms/data structures when applicable",
+            "8. Final takeaway or interview-ready summary.",
             "Use the conversation history as context and answer the latest user message.",
             "Conversation:",
         ]

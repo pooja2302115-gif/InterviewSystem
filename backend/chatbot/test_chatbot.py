@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import torch
 
@@ -72,6 +73,22 @@ class InferenceTests(unittest.TestCase):
         engine = InferenceEngine(model, tokenizer, device=torch.device("cpu"))
         with self.assertRaises(ValueError):
             engine.generate_text("hello", config=GenerationConfig(max_new_tokens=0))
+
+    def test_checkpoint_vocabulary_mismatch_reports_sizes_and_recovery(self):
+        tokenizer = InterviewTokenizer.build(["hello", "world"])
+        model = InterviewLLM(
+            tokenizer.vocabulary_size + 1,
+            context_length=8,
+            embedding_dimension=8,
+            num_layers=1,
+            num_heads=2,
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            vocabulary_path = Path(directory) / "vocab.json"
+            tokenizer.save(vocabulary_path)
+            with patch("backend.chatbot.inference.load_checkpoint_model", return_value=(model, {})):
+                with self.assertRaisesRegex(ValueError, "uses .* tokens.*contains .*Use the vocabulary saved"):
+                    InferenceEngine.from_checkpoint("model.pt", vocabulary_path, device=torch.device("cpu"))
 
 
 if __name__ == "__main__":

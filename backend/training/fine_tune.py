@@ -51,7 +51,10 @@ def main() -> None:
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
 
-    device = torch.device("cuda" if args.device == "auto" and torch.cuda.is_available() else args.device)
+    if args.device == "auto":
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device(args.device)
     tokenizer = InterviewTokenizer.load(args.vocabulary)
     model, _ = load_checkpoint_model(args.base_checkpoint, device=device)
     train_loader = create_instruction_dataloader(

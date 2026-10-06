@@ -47,7 +47,13 @@ class InferenceEngine:
         model, _ = load_checkpoint_model(checkpoint_path, device=resolved_device)
         tokenizer = InterviewTokenizer.load(vocabulary_path)
         if model.vocabulary_size != tokenizer.vocabulary_size:
-            raise ValueError("checkpoint vocabulary size does not match tokenizer vocabulary")
+            raise ValueError(
+                "Checkpoint and tokenizer are incompatible: "
+                f"{checkpoint_path} uses {model.vocabulary_size} tokens, but "
+                f"{vocabulary_path} contains {tokenizer.vocabulary_size}. "
+                "Use the vocabulary saved with this checkpoint, or retrain/fine-tune "
+                "a checkpoint using the current vocabulary."
+            )
         return cls(model, tokenizer, device=resolved_device)
 
     def generate_token_ids(

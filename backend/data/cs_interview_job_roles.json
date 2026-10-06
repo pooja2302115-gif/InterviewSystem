@@ -1,0 +1,351 @@
+{
+  "Software Developer": {
+    "skills": [
+      "programming",
+      "data structures",
+      "algorithms",
+      "oop",
+      "software engineering",
+      "testing",
+      "git",
+      "system design"
+    ],
+    "subjects": [
+      "Programming",
+      "Data Structures",
+      "Algorithms",
+      "OOP",
+      "Software Engineering",
+      "Computer Architecture",
+      "System Design",
+      "Software Testing",
+      "Git and GitHub",
+      "IoT",
+      "Theory of Computation",
+      "Compiler Design"
+    ]
+  },
+  "Python Developer": {
+    "skills": [
+      "python",
+      "programming",
+      "data structures",
+      "algorithms",
+      "oop",
+      "api",
+      "testing",
+      "git"
+    ],
+    "subjects": [
+      "Programming",
+      "Data Structures",
+      "Algorithms",
+      "OOP",
+      "Git and GitHub"
+    ]
+  },
+  "Java Developer": {
+    "skills": [
+      "java",
+      "programming",
+      "data structures",
+      "algorithms",
+      "oop",
+      "dbms",
+      "api",
+      "testing",
+      "git"
+    ],
+    "subjects": [
+      "Programming",
+      "Data Structures",
+      "Algorithms",
+      "OOP",
+      "DBMS",
+      "Git and GitHub",
+      "API and Web Services"
+    ]
+  },
+  "Full Stack Developer": {
+    "skills": [
+      "javascript",
+      "html",
+      "css",
+      "web development",
+      "frontend",
+      "backend",
+      "api",
+      "dbms",
+      "git",
+      "testing"
+    ],
+    "subjects": [
+      "DBMS",
+      "Software Engineering",
+      "Web Development",
+      "Software Testing",
+      "Git and GitHub",
+      "API and Web Services"
+    ]
+  },
+  "Frontend Developer": {
+    "skills": [
+      "javascript",
+      "html",
+      "css",
+      "web development",
+      "frontend",
+      "api",
+      "testing",
+      "git"
+    ],
+    "subjects": [
+      "Software Engineering",
+      "Web Development",
+      "Software Testing",
+      "Git and GitHub",
+      "API and Web Services"
+    ]
+  },
+  "Backend Developer": {
+    "skills": [
+      "programming",
+      "backend",
+      "api",
+      "dbms",
+      "system design",
+      "distributed systems",
+      "security",
+      "testing",
+      "git"
+    ],
+    "subjects": [
+      "Programming",
+      "OOP",
+      "DBMS",
+      "Computer Networks",
+      "Software Engineering",
+      "Web Development",
+      "Cybersecurity",
+      "Cloud Computing",
+      "DevOps",
+      "System Design",
+      "Distributed Systems",
+      "Software Testing",
+      "Git and GitHub",
+      "API and Web Services"
+    ]
+  },
+  "Data Analyst": {
+    "skills": [
+      "sql",
+      "dbms",
+      "statistics",
+      "data science",
+      "programming",
+      "cloud"
+    ],
+    "subjects": [
+      "DBMS",
+      "Cloud Computing",
+      "Data Science"
+    ]
+  },
+  "Data Scientist": {
+    "skills": [
+      "python",
+      "programming",
+      "data science",
+      "machine learning",
+      "statistics",
+      "ai"
+    ],
+    "subjects": [
+      "Programming",
+      "Algorithms",
+      "DBMS",
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Data Science"
+    ]
+  },
+  "AI Engineer": {
+    "skills": [
+      "programming",
+      "ai",
+      "machine learning",
+      "deep learning",
+      "nlp",
+      "generative ai",
+      "llm",
+      "api",
+      "cloud"
+    ],
+    "subjects": [
+      "Programming",
+      "Algorithms",
+      "Computer Architecture",
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Deep Learning",
+      "NLP",
+      "Generative AI",
+      "LLM",
+      "Computer Vision",
+      "Cloud Computing",
+      "Distributed Systems",
+      "API and Web Services"
+    ]
+  },
+  "ML Engineer": {
+    "skills": [
+      "python",
+      "programming",
+      "machine learning",
+      "deep learning",
+      "data science",
+      "cloud",
+      "devops"
+    ],
+    "subjects": [
+      "Programming",
+      "Algorithms",
+      "Computer Architecture",
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Deep Learning",
+      "Cloud Computing",
+      "DevOps",
+      "Data Science"
+    ]
+  },
+  "Generative AI Engineer": {
+    "skills": [
+      "python",
+      "programming",
+      "generative ai",
+      "llm",
+      "nlp",
+      "machine learning",
+      "api",
+      "cloud"
+    ],
+    "subjects": [
+      "Programming",
+      "Machine Learning",
+      "Deep Learning",
+      "NLP",
+      "Generative AI",
+      "LLM",
+      "Cloud Computing",
+      "API and Web Services"
+    ]
+  },
+  "Computer Vision Engineer": {
+    "skills": [
+      "python",
+      "programming",
+      "computer vision",
+      "deep learning",
+      "machine learning",
+      "data science"
+    ],
+    "subjects": [
+      "Programming",
+      "Machine Learning",
+      "Deep Learning",
+      "Computer Vision"
+    ]
+  },
+  "DevOps Engineer": {
+    "skills": [
+      "linux",
+      "networking",
+      "cloud",
+      "devops",
+      "distributed systems",
+      "security",
+      "git",
+      "testing"
+    ],
+    "subjects": [
+      "Operating Systems",
+      "Computer Networks",
+      "Cybersecurity",
+      "Cloud Computing",
+      "DevOps",
+      "Distributed Systems",
+      "Git and GitHub"
+    ]
+  },
+  "Cloud Engineer": {
+    "skills": [
+      "networking",
+      "cloud",
+      "devops",
+      "distributed systems",
+      "security",
+      "system design"
+    ],
+    "subjects": [
+      "Computer Networks",
+      "Cybersecurity",
+      "Cloud Computing",
+      "DevOps",
+      "System Design",
+      "Distributed Systems",
+      "IoT"
+    ]
+  },
+  "Cybersecurity Engineer": {
+    "skills": [
+      "security",
+      "networking",
+      "operating systems",
+      "programming",
+      "cloud"
+    ],
+    "subjects": [
+      "Programming",
+      "Operating Systems",
+      "Computer Networks",
+      "Cybersecurity"
+    ]
+  },
+  "QA Engineer": {
+    "skills": [
+      "testing",
+      "software engineering",
+      "programming",
+      "api",
+      "web development",
+      "git"
+    ],
+    "subjects": [
+      "Programming",
+      "Software Engineering",
+      "Web Development",
+      "Software Testing",
+      "Git and GitHub",
+      "API and Web Services"
+    ]
+  },
+  "Blockchain Developer": {
+    "skills": [
+      "blockchain",
+      "programming",
+      "security",
+      "distributed systems",
+      "api",
+      "git"
+    ],
+    "subjects": [
+      "Programming",
+      "Cybersecurity",
+      "Distributed Systems",
+      "Blockchain",
+      "Git and GitHub",
+      "API and Web Services"
+    ]
+  }
+}

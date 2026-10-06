@@ -38,6 +38,49 @@ class QuestionBankRetrieverTests(unittest.TestCase):
     def test_unrelated_question_returns_no_match(self):
         self.assertIsNone(self.retriever.answer("What is the capital of an imaginary planet?"))
 
+    def test_list_definition_returns_only_three_grounded_sections(self):
+        answer = self.retriever.answer("What is a Python list?")
+        self.assertIn("mutable, ordered sequence", answer)
+        self.assertIn("items = [\"bread\", \"milk\"]", answer)
+        self.assertEqual(answer.count("**"), 6)
+        self.assertNotIn("reduce duplication", answer)
+
+    def test_answers_requested_comparisons_with_situation_based_guidance(self):
+        cases = (
+            ("Compare list and tuple", ("mutable", "immutable", "fixed record")),
+            ("diff binary search and linear search", ("o(log n)", "o(n)", "sorted data")),
+            ("For ticket entry, queue or stack which is best?", ("first in, first out", "use a queue", "priority queue")),
+        )
+        for query, expected_phrases in cases:
+            with self.subTest(query=query):
+                answer = self.retriever.answer(query)
+                for phrase in expected_phrases:
+                    self.assertIn(phrase, answer.casefold())
+
+    def test_evaluates_exception_handling_answer(self):
+        answer = self.retriever.answer(
+            "Evaluate this: An exception is an unexpected event or error that occurs during "
+            "the execution of a program and interrupts its normal flow. Exception handling "
+            "is used to handle these errors without crashing the program."
+        )
+        self.assertIn("6.7/10", answer)
+        self.assertIn("### Why it is good", answer)
+        self.assertIn("### Missing points", answer)
+        self.assertIn("### Better interview answer", answer)
+        self.assertIn("try/except", answer)
+
+    def test_evaluates_binary_search_with_interview_style_feedback(self):
+        answer = self.retriever.answer(
+            "Evaluate this: Binary Search is a searching algorithm used to find an element "
+            "in a sorted array by repeatedly dividing the search range into two halves."
+        )
+        self.assertIn("**9/10**", answer)
+        self.assertIn("Relevance: relevant.", answer)
+        self.assertIn("### Why it is good", answer)
+        self.assertIn("### Small improvement", answer)
+        self.assertIn("middle element", answer)
+        self.assertIn("### Better interview answer", answer)
+
 
 if __name__ == "__main__":
     unittest.main()

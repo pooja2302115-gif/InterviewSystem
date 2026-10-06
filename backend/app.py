@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 from backend.chatbot.conversation import ConversationManager
 from backend.chatbot.inference import InferenceEngine
+from backend.chatbot.interview_dataset import InterviewDataset
 from backend.chatbot.retrieval import QuestionBankRetriever
 from backend.resume.parser import extract_resume_file
 
@@ -31,6 +32,19 @@ class ChatResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool
+
+
+class QuestionGenerationRequest(BaseModel):
+    job_role: str | None = Field(default=None, min_length=1, max_length=100)
+    skills: list[str] = Field(default_factory=list, max_length=20)
+    subject: str | None = Field(default=None, min_length=1, max_length=100)
+    difficulty: str | None = None
+    count: int = Field(default=5, ge=1, le=50)
+
+
+class AnswerEvaluationRequest(BaseModel):
+    question_id: str = Field(min_length=1, max_length=200)
+    answer: str = Field(min_length=1, max_length=10000)
 
 
 class ChatService:
@@ -61,6 +75,7 @@ def create_app(
     device: torch.device | None = None,
 ) -> FastAPI:
     service = ChatService(manager)
+    interview_dataset = InterviewDataset()
     if service.manager is None and checkpoint_path and vocabulary_path:
         engine = InferenceEngine.from_checkpoint(checkpoint_path, vocabulary_path, device=device)
         service.manager = ConversationManager(engine, retriever=QuestionBankRetriever())
@@ -83,6 +98,35 @@ def create_app(
     def chat(request: ChatRequest) -> ChatResponse:
         result = service.chat(request)
         return ChatResponse(**result)
+
+    @app.get("/interview/subjects")
+    def interview_subjects() -> dict[str, list[str]]:
+        return {"subjects": interview_dataset.subjects()}
+
+    @app.get("/interview/job-roles")
+    def interview_job_roles() -> dict[str, dict[str, Any]]:
+        return interview_dataset.job_roles()
+
+    @app.post("/interview/questions")
+    def generate_interview_questions(request: QuestionGenerationRequest) -> dict[str, Any]:
+        try:
+            questions = interview_dataset.generate_questions(
+                job_role=request.job_role,
+                skills=request.skills,
+                subject=request.subject,
+                difficulty=request.difficulty,
+                count=request.count,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"questions": questions, "count": len(questions)}
+
+    @app.post("/interview/evaluate")
+    def evaluate_interview_answer(request: AnswerEvaluationRequest) -> dict[str, Any]:
+        try:
+            return interview_dataset.evaluate_answer(request.question_id, request.answer)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post("/resume/analyze")
     async def analyze_resume(file: UploadFile = File(...)) -> dict[str, Any]:
